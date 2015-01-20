@@ -3,7 +3,8 @@ using System.Collections;
 
 public class Ground : MonoBehaviour {
 
-    public float ScrollSpeed = 5f;
+    [SerializeField]
+    private float _scrollSpeed = 5f;
 
 	// Update is called once per frame
     void Update()
@@ -11,15 +12,25 @@ public class Ground : MonoBehaviour {
         if (GameState.IsPaused)
             return;
 
-        Vector2 offset = this.renderer.material.GetTextureOffset("_MainTex");
+        ScrollTextureLeftUsingSetTextureOffset();
+    }
 
-        float amountToScroll = Time.deltaTime * ScrollSpeed;
+    private void ScrollTextureLeftUsingSetTextureOffset()
+    {
+        // Get the current offset
+        Vector2 currentTextureOffset = this.renderer.material.GetTextureOffset("_MainTex");
 
-        float newOffsetX = offset.x + amountToScroll;
+        // Determine the amount to scroll this frame
+        float distanceToScrollLeft = Time.deltaTime * _scrollSpeed; 
 
-        offset = new Vector2(newOffsetX, offset.y);
+        // Calculate the new offset (Add current + distance)
+        float newTextureOffset_X = currentTextureOffset.x + distanceToScrollLeft;
 
-        this.renderer.material.SetTextureOffset("_MainTex", offset);
+        // Create a new Vector2 with the updated offset
+        currentTextureOffset = new Vector2(newTextureOffset_X, currentTextureOffset.y);
+
+        // Set the offset to our new value
+        this.renderer.material.SetTextureOffset("_MainTex", currentTextureOffset);
     }
 
     void OnTriggerEnter2D(Collider2D other)

@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ScoreArea : MonoBehaviour {
+public class ScoreArea : MonoBehaviour 
+{
 
-    bool _entered;
+    private bool _entered;
     void OnTriggerEnter2D(Collider2D other)
     {
         if (_entered)

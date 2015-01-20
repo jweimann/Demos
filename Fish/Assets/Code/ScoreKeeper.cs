@@ -4,8 +4,9 @@ using UnityEngine.UI;
 
 public class ScoreKeeper : MonoBehaviour {
 
-    public int Score = 0;
-    public static int HighScore = 0;
+    public int Score { get; private set; }
+    
+    public static int HighScore { get; set; }
 
     [SerializeField]
     private Text _scoreText;

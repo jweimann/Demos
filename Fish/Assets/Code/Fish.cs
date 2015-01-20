@@ -4,13 +4,12 @@ using UnityEngine.UI;
 
 public class Fish : MonoBehaviour
 {
-
-    public float flightHeight = 500f;
-    public float tiltSpeed = 10f;
-
     [SerializeField]
-    private Text _gameover;
-
+    private float flightHeight = 500f;
+    [SerializeField]
+    private float tiltSpeed = 10f;
+    [SerializeField]
+    private Text _gameOverText;
     [SerializeField]
     private ScoreKeeper _scorekeeper;
 
@@ -25,7 +24,7 @@ public class Fish : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (_restarted)
+        if (GameState.IsPaused)
         {
             if (Input.GetButtonDown("Fire1"))
             {
@@ -33,20 +32,10 @@ public class Fish : MonoBehaviour
             }
             return;
         }
-        else if (GameState.IsPaused)
-        {
-            if (Input.GetButtonDown("Fire1"))
-            {
-                Application.LoadLevel(0);
-            }
-            return;
-        }
-        
 
         if (Input.GetButtonDown("Fire1"))
         {
-            rigidbody2D.velocity = Vector2.zero;
-            rigidbody2D.AddForce(Vector3.up * flightHeight);
+            StopFishThenAddUpwardForce();
         }
 
         if (FishIsTooHighOrTooLow())
@@ -55,6 +44,12 @@ public class Fish : MonoBehaviour
         }
 
         TiltFishBasedOnVelocity();
+    }
+
+    private void StopFishThenAddUpwardForce()
+    {
+        rigidbody2D.velocity = Vector2.zero;
+        rigidbody2D.AddForce(Vector3.up * flightHeight);
     }
 
     private void TiltFishBasedOnVelocity()
@@ -78,19 +73,19 @@ public class Fish : MonoBehaviour
         GameState.IsPaused = false;
         rigidbody2D.isKinematic = false;
         _restarted = false;
-        _gameover.gameObject.SetActive(false);
+        _gameOverText.gameObject.SetActive(false);
     }
     public void PauseGame()
     {
-        _gameover.gameObject.SetActive(true);
+        _gameOverText.gameObject.SetActive(true);
         if (_scorekeeper.Score > ScoreKeeper.HighScore)
         {
             ScoreKeeper.HighScore = _scorekeeper.Score;
-            _gameover.text = "You got a high score of " + ScoreKeeper.HighScore;
+            _gameOverText.text = "You got a high score of " + ScoreKeeper.HighScore;
         }
         else
         {
-            _gameover.text = "You scored " + _scorekeeper.Score + " your high score was " + ScoreKeeper.HighScore;
+            _gameOverText.text = "You scored " + _scorekeeper.Score + " your high score was " + ScoreKeeper.HighScore;
         }
         GameState.IsPaused = true;
         rigidbody2D.isKinematic = true;
