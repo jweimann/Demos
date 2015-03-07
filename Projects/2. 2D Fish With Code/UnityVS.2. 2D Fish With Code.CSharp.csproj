@@ -62,6 +62,7 @@
     <Compile Include="Assets\Code\GameState.cs" />
     <Compile Include="Assets\Code\Ground.cs" />
     <Compile Include="Assets\Code\GroundWeed.cs" />
+    <Compile Include="Assets\Code\MonoSingleton.cs" />
     <Compile Include="Assets\Code\ScoreArea.cs" />
     <Compile Include="Assets\Code\ScoreKeeper.cs" />
     <Compile Include="Assets\Code\Seaweed.cs" />

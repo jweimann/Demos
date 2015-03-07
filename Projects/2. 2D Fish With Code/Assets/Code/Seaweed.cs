@@ -14,7 +14,7 @@ public class Seaweed : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
-        if (GameState.IsPaused)
+        if (GameState.Instance.ObjectsShouldStop)
             return;
 
         MoveForward();

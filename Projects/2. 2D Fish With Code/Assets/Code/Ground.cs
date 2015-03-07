@@ -9,7 +9,7 @@ public class Ground : MonoBehaviour
 	// Update is called once per frame
     void Update()
     {
-        if (GameState.IsPaused)
+        if (GameState.Instance.ObjectsShouldStop)
             return;
 
         // Get the current Texture Offset
@@ -30,6 +30,9 @@ public class Ground : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        Application.LoadLevel(0);
+        if (GameObject.FindObjectOfType<GameState>() != null)
+            GameState.Instance.KillPlayer();
+        else
+            Application.LoadLevel(0);
     }
 }

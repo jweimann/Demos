@@ -4,57 +4,72 @@ using UnityEngine.UI;
 
 public class Fish : MonoBehaviour
 {
-
-    public float flightHeight = 500f;
-    public float tiltSpeed = 10f;
+    #region Inspector Fields
 
     [SerializeField]
-    private Text _gameover;
-
+    private float _flightHeight = 500f;
+    [SerializeField]
+    private float _tiltSpeed = 10f;
+    
     [SerializeField]
     private ScoreKeeper _scorekeeper;
 
-    private bool _restarted = true;
+    #endregion
+
+    #region Private Properties
+    private bool FishIsTooHighOrTooLow { get { return transform.position.y < -19f || transform.position.y > 25f; } }
+    #endregion
 
     void Start()
     {
-        GameState.IsPaused = true;
-        rigidbody2D.isKinematic = true;
+        rigidbody2D.isKinematic = true; // Stops the fish from moving due to gravity & collisions
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (_restarted)
-        {
-            if (Input.GetButtonDown("Fire1"))
-            {
-                ResumeGame();
-            }
-            return;
-        }
-        else if (GameState.IsPaused)
-        {
-            if (Input.GetButtonDown("Fire1"))
-            {
-                Application.LoadLevel(0);
-            }
-            return;
-        }
-        
-
         if (Input.GetButtonDown("Fire1"))
         {
-            rigidbody2D.velocity = Vector2.zero;
-            rigidbody2D.AddForce(Vector3.up * flightHeight);
+            HandleFire1Pressed();
         }
 
-        if (FishIsTooHighOrTooLow())
+        if (FishIsTooHighOrTooLow)
         {
             PauseGame();
         }
 
         TiltFishBasedOnVelocity();
+    }
+
+    private void HandleFire1Pressed()
+    {
+        if (GameState.Instance.IsPlayerDead)
+        {
+            GameState.Instance.GameHasStarted = false;
+            Application.LoadLevel(0);
+        }
+        else if (GameState.Instance.GameHasStarted == false)
+        {
+            GameState.Instance.StartGame();
+        }
+        else
+        {
+            AddUpwardForceToFish();
+        }
+    }
+
+    private void AddUpwardForceToFish()
+    {
+        rigidbody2D.velocity = Vector2.zero; // Stops the fish
+        rigidbody2D.AddForce(Vector3.up * _flightHeight);
+    }
+
+    private static void RestartGameIfPlayerPressesFire1()
+    {
+        if (Input.GetButtonDown("Fire1"))
+        {
+            Application.LoadLevel(0);
+        }
     }
 
     private void TiltFishBasedOnVelocity()
@@ -64,35 +79,17 @@ public class Fish : MonoBehaviour
         float angle = Mathf.Lerp(-75f, 45f, pct);
 
         var targetRotation = Quaternion.Euler(new Vector3(0, 0, angle));
-        transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.deltaTime * tiltSpeed);
+        transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.deltaTime * _tiltSpeed);
     }
 
-    private bool FishIsTooHighOrTooLow()
+    
+    public void ResumeGame()
     {
-        return transform.position.y < -19f ||
-                 transform.position.y > 25f;
+        rigidbody2D.isKinematic = false; // Make the fish use physics again.
     }
 
-    private void ResumeGame()
-    {
-        GameState.IsPaused = false;
-        rigidbody2D.isKinematic = false;
-        _restarted = false;
-        _gameover.gameObject.SetActive(false);
-    }
     public void PauseGame()
     {
-        _gameover.gameObject.SetActive(true);
-        if (_scorekeeper.Score > ScoreKeeper.HighScore)
-        {
-            ScoreKeeper.HighScore = _scorekeeper.Score;
-            _gameover.text = "You got a high score of " + ScoreKeeper.HighScore;
-        }
-        else
-        {
-            _gameover.text = "You scored " + _scorekeeper.Score + " your high score was " + ScoreKeeper.HighScore;
-        }
-        GameState.IsPaused = true;
         rigidbody2D.isKinematic = true;
     }
 }
